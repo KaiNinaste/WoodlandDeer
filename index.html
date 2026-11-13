@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0d1610" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2316241b'/><text y='.9em' font-size='75' x='12'>🦌</text></svg>" />
+  <title>Bramble's Woodland Glade</title>
+  <style>
+    :root {
+      --bg-deep: #0d1610;
+      --bg-card: #15221a;
+      --bg-card-soft: #1b2c21;
+      --border: #2a4032;
+      --text-main: #edf5ef;
+      --text-muted: #9eb5a6;
+      --accent: #7ec895;
+      --accent-warm: #e4b567;
+      --accent-blue: #7ec4cf;
+      --danger: #e27c7c;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-main);
+      padding: 12px 12px 54px;
+      max-width: 560px;
+      margin-inline: auto;
+      line-height: 1.45;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--bg-card-soft); border: 1px solid var(--border);
+      border-radius: 999px; padding: 4px 10px; font-size: 0.77rem; color: var(--text-main);
+    }
+    .btn {
+      background: var(--bg-card-soft); color: var(--text-main);
+      border: 1px solid var(--border); border-radius: 11px;
+      padding: 8px 11px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: #264833; border-color: var(--accent); color: #eafff0; }
+    .btn-warm { background: #3b2f19; border-color: var(--accent-warm); color: #fff4dd; }
+    .btn-sm { padding: 5px 9px; font-size: 0.75rem; }
+    .glade-wrap {
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--border); margin: 10px 0 8px;
+      background: #17272e;
+    }
+    .bar-bg { height: 8px; background: #0b130e; border-radius: 999px; overflow: hidden; margin-top: 6px; }
+    .bar-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+    .bar-warm { background: var(--accent-warm); }
+    .tabs {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 6px; margin-bottom: 12px;
+    }
+    .tab-btn {
+      background: transparent; border: 1px solid transparent; color: var(--text-muted);
+      border-radius: 11px; padding: 8px 3px; font-size: 0.71rem; font-weight: 600;
+      cursor: pointer; text-align: center; line-height: 1.25;
+    }
+    .tab-btn.active {
+      background: var(--bg-card-soft); border-color: var(--accent); color: var(--text-main);
+    }
+    .section { display: none; }
+    .section.active { display: block; }
+    h2 { font-size: 1.05rem; margin: 0 0 6px; }
+    h3 { font-size: 0.92rem; margin: 0 0 4px; color: var(--accent-warm); }
+    p.muted { color: var(--text-muted); font-size: 0.81rem; margin: 0 0 10px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .item-card {
+      background: var(--bg-card-soft); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px;
+    }
+    .quest-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg-card-soft); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer;
+    }
+    .quest-row.done { opacity: 0.6; border-color: var(--accent); }
+    input, select, textarea {
+      width: 100%; background: #0d1610; color: var(--text-main);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 8px 10px; font-size: 0.84rem; font-family: inherit;
+    }
+    .chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .chip {
+      background: #0d1610; border: 1px solid var(--border); color: var(--text-muted);
+      border-radius: 999px; padding: 5px 10px; font-size: 0.77rem; cursor: pointer;
+    }
+    .chip.selected { background: #264833; border-color: var(--accent); color: #fff; }
+    .toast {
+      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+      background: #1f3b2a; border: 1px solid var(--accent); color: #fff;
+      padding: 8px 16px; border-radius: 999px; font-size: 0.82rem;
+      z-index: 999; display: none; box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+      max-width: 90vw; text-align: center;
+    }
+    @keyframes floatSoft { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+    @keyframes hopJoy { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-7px); } }
+    #deer-group { animation: floatSoft 3.5s ease-in-out infinite; cursor: pointer; }
+    .hop { animation: hopJoy 0.55s ease 2 !important; }
+    @keyframes pulseGlow { 0%,100% { opacity: 0.85; } 50% { opacity: 1; filter: drop-shadow(0 0 6px #ffd479); } }
+    .mushroom-pulse { animation: pulseGlow 1.6s ease-in-out 2; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP COMPANION & GLADE CARD -->
+  <div class="card">
+    <div class="row" style="margin-bottom:8px;">
+      <div>
+        <div class="row" style="justify-content:flex-start;">
+          <strong style="font-size:1.15rem;">Bramble</strong>
+          <span class="pill" id="stage-pill">Spotted Fawn · Lv.1</span>
+        </div>
+        <div style="font-size:0.79rem; color:var(--text-muted);" id="status-line">Waiting peacefully in the mossy glade</div>
+      </div>
+      <div class="row">
+        <button class="btn btn-sm" onclick="exportBackup()">💾 Backup</button>
+        <button class="btn btn-sm" onclick="document.getElementById('restore-input').click()">📂 Restore</button>
+        <input type="file" id="restore-input" accept=".json" style="display:none" onchange="importBackup(event)" />
+      </div>
+    </div>
+
+    <!-- Status Pills -->
+    <div class="row" style="margin-bottom:6px;">
+      <span class="pill">🌿 <strong id="leaves-top">0</strong></span>
+      <button class="pill" style="cursor:pointer;" onclick="syncWeather()" id="weather-pill">⛅ Sync Weather</button>
+      <span class="pill" id="moon-pill">🌔 Waxing</span>
+      <span class="pill" id="sabbat-pill" onclick="switchTab('lore')" style="cursor:pointer;">🍂 Samhain Tide</span>
+    </div>
+
+    <!-- Live Deity & Threshold Banner -->
+    <div class="item-card" style="padding:8px 10px; margin-bottom:6px; cursor:pointer;" onclick="switchTab('lore')">
+      <div class="row">
+        <span style="font-size:0.78rem; color:var(--accent-warm);" id="deity-time-badge">🕯️ Dusk Threshold · Gwyn ap Nudd</span>
+        <span style="font-size:0.74rem; color:var(--text-muted);" id="deity-day-badge">Friday · Sulis</span>
+      </div>
+    </div>
+
+    <!-- 100% UNOBSTRUCTED GLADE CANVAS (NO OVERLAYS INSIDE) -->
+    <div class="glade-wrap">
+      <svg id="glade-svg" viewBox="0 0 440 245" width="100%" height="auto" style="display:block;">
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop id="sky-top" offset="0%" stop-color="#192934" />
+            <stop id="sky-bot" offset="100%" stop-color="#2f493e" />
+          </linearGradient>
+          <radialGradient id="pondGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#7fd6f7" />
+            <stop offset="100%" stop-color="#276987" />
+          </radialGradient>
+          <linearGradient id="deerCoatGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop id="deer-coat-top" offset="0%" stop-color="#c87b42" />
+            <stop id="deer-coat-mid" offset="65%" stop-color="#a65c2b" />
+            <stop id="deer-coat-belly" offset="100%" stop-color="#f2e4cf" />
+          </linearGradient>
+          <linearGradient id="deerNeckGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop id="deer-neck-1" offset="0%" stop-color="#b86b35" />
+            <stop id="deer-neck-2" offset="100%" stop-color="#8c4a1f" />
+          </linearGradient>
+          <linearGradient id="foxGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#df6822" />
+            <stop offset="70%" stop-color="#b54912" />
+            <stop offset="100%" stop-color="#f5efe6" />
+          </linearGradient>
+          <linearGradient id="cockerGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#d47a2a" />
+            <stop offset="100%" stop-color="#8f4710" />
+          </linearGradient>
+          <radialGradient id="whiteAura" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fff8e3" stop-opacity="0.45" />
+            <stop offset="70%" stop-color="#d9f0ff" stop-opacity="0.12" />
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+
+        <!-- Sky & Celestial Orb -->
+        <rect width="440" height="245" fill="url(#skyGrad)" />
+        <circle id="celestial-orb" cx="375" cy="40" r="16" fill="#f7e5a6" opacity="0.88" />
+
+        <!-- Rolling Somerset Hills -->
+        <path d="M0,136 Q115,112 230,134 T440,126 L440,245 L0,245 Z" fill="#1f3825" />
+        <path d="M0,156 Q155,142 300,158 T440,150 L440,245 L0,245 Z" fill="#284a30" />
+
+        <!-- Background Woodland Trees -->
+        <g opacity="0.9">
+          <rect x="24" y="74" width="11" height="72" fill="#453122" />
+          <circle cx="29" cy="64" r="29" id="tree-canopy-1" fill="#5e4726" />
+          <rect x="66" y="84" width="10" height="64" fill="#453122" />
+          <circle cx="71" cy="73" r="25" id="tree-canopy-2" fill="#3a5731" />
+          <rect x="355" y="70" width="11" height="74" fill="#453122" />
+          <circle cx="360" cy="58" r="30" id="tree-canopy-3" fill="#6b4d27" />
+          <rect x="398" y="82" width="10" height="64" fill="#453122" />
+          <circle cx="403" cy="70" r="25" id="tree-canopy-4" fill="#36542e" />
+        </g>
+
+        <!-- Seasonal Blossoms / Snowdrops -->
+        <g id="seasonal-flora" opacity="0.85"></g>
+
+        <!-- Unlockable: Barn Owl (Majestic Perched Silhouette on Left Bough) -->
+        <g id="comp-owl" style="display:none; cursor:pointer;" onclick="tapCompanion('owl')">
+          <path d="M44,96 Q62,92 82,97" stroke="#3b281b" stroke-width="4.5" fill="none" stroke-linecap="round" />
+          <polygon points="60,92 67,92 65,103 61,103" fill="#b89b72" />
+          <path d="M55,76 C53,85 56,94 63,95 C70,94 73,85 71,76 Z" fill="#c9ab81" />
+          <ellipse cx="63.5" cy="85" rx="5.2" ry="8.5" fill="#fbf7f0" />
+          <circle cx="62" cy="83" r="0.7" fill="#7a6348" />
+          <circle cx="65" cy="86" r="0.7" fill="#7a6348" />
+          <circle cx="62.5" cy="89" r="0.7" fill="#7a6348" />
+          <path d="M56,71 C56,64 71,64 71,71 C71,76 66,79 63.5,80 C61,79 56,76 56,71 Z" fill="#f7f1e6" stroke="#b59469" stroke-width="1" />
+          <path d="M58,70 Q61,67 63.5,71 Q66,67 69,70" fill="none" stroke="#a38258" stroke-width="0.9" />
+          <circle cx="60.8" cy="71.5" r="1.4" fill="#17120e" />
+          <circle cx="66.2" cy="71.5" r="1.4" fill="#17120e" />
+          <polygon points="62.8,73 64.2,73 63.5,75.5" fill="#cfa052" />
+          <path d="M60,94 L60,97 M66,94 L66,97" stroke="#4a3c31" stroke-width="1.4" stroke-linecap="round" />
+        </g>
+
+        <!-- Unlockable: Sulis Sacred Spring Shrine (Far Right) -->
+        <g id="decor-sulis" style="display:none; cursor:pointer;" onclick="tapScenery('sulis')">
+          <rect x="392" y="138" width="18" height="24" rx="2" fill="#8b968e" />
+          <polygon points="389,138 401,128 413,138" fill="#6f7a72" />
+          <circle cx="401" cy="148" r="3" fill="#f5c96b" />
+        </g>
+
+        <!-- Unlockable: Wildlife Pond (Right Clearing) -->
+        <g id="decor-pond" style="display:none; cursor:pointer;" onclick="tapScenery('pond')">
+          <ellipse cx="352" cy="194" rx="48" ry="16" fill="url(#pondGrad)" stroke="#73a895" stroke-width="2" />
+          <ellipse id="pond-ripple" cx="352" cy="194" rx="22" ry="6" fill="none" stroke="#bcebff" stroke-width="1.2" opacity="0.65" />
+          <circle cx="370" cy="191" r="3.8" fill="#f49ac2" />
+        </g>
+
+        <!-- Unlockable: Genii Cucullati Trio (Back Mid-Right) -->
+        <g id="decor-cucullati" style="display:none; cursor:pointer;" onclick="tapScenery('cucullati')">
+          <path d="M294,166 L299,151 L304,166 Z" fill="#5b6e61" />
+          <path d="M306,167 L311,153 L316,167 Z" fill="#4f6155" />
+          <path d="M318,166 L323,152 L328,166 Z" fill="#5b6e61" />
+        </g>
+
+        <!-- Unlockable: Mossy Stepping Stones -->
+        <g id="decor-stones" style="display:none;">
+          <ellipse cx="268" cy="198" rx="11" ry="5.5" fill="#707d75" />
+          <ellipse cx="288" cy="204" rx="9" ry="4.5" fill="#5f6c64" />
+          <ellipse cx="255" cy="207" rx="8" ry="4" fill="#68766d" />
+        </g>
+
+        <!-- Unlockable: Nodens Bronze Hound -->
+        <g id="decor-nodens" style="display:none; cursor:pointer;" onclick="tapScenery('nodens')">
+          <ellipse cx="116" cy="182" rx="10" ry="3.5" fill="#6b532f" />
+          <rect x="110" y="172" width="11" height="6" rx="3" fill="#b88b4a" />
+          <circle cx="122" cy="170" r="4" fill="#b88b4a" />
+        </g>
+
+        <!-- Unlockable: Red Fox (Alert Seated Woodland Silhouette) -->
+        <g id="comp-fox" style="display:none; cursor:pointer;" onclick="tapCompanion('fox')">
+          <ellipse cx="76" cy="183" rx="16" ry="3.2" fill="#132417" opacity="0.55" />
+          <path d="M68,180 C53,182 47,173 56,167 C63,163 70,171 72,177 Z" fill="#cf5d1b" />
+          <path d="M52,174 C49,171 52,167 57,167 C56,170 55,173 52,174 Z" fill="#faf5ed" />
+          <path d="M70,181 L73,164 C74,159 83,159 85,165 L87,181 Z" fill="url(#foxGrad)" />
+          <path d="M77,163 C81,164 84,169 83,174 C79,173 77,168 77,163 Z" fill="#faf5ed" />
+          <rect x="75" y="173" width="2.8" height="9" rx="1.2" fill="#261b14" />
+          <rect x="82" y="173" width="2.8" height="9" rx="1.2" fill="#261b14" />
+          <polygon points="75,157 77,147 81,155" fill="#261b14" />
+          <polygon points="82,156 85,147 87,156" fill="#261b14" />
+          <path d="M74,159 C74,154 85,153 88,158 L94,161 L87,164 C82,165 75,163 74,159 Z" fill="#df6822" />
+          <path d="M82,161 L93,161 L87,164 C83,164 81,163 82,161 Z" fill="#faf5ed" />
+          <circle cx="94" cy="161" r="1.2" fill="#17110d" />
+          <circle cx="84.5" cy="158.2" r="1.2" fill="#17110d" />
+        </g>
+
+        <!-- Unlockable: Glowing Mushrooms (Front Left) -->
+        <g id="decor-mushrooms" style="display:none; cursor:pointer;" onclick="tapScenery('mushrooms')">
+          <rect x="34" y="204" width="4.5" height="13" rx="2" fill="#f2eadc" />
+          <path d="M25,205 Q36,190 47,205 Z" fill="#e05a47" />
+          <circle cx="33" cy="199" r="1.6" fill="#fff6d6" />
+          <circle cx="40" cy="200" r="1.4" fill="#fff6d6" />
+          <rect x="50" y="209" width="3.5" height="10" rx="1.5" fill="#f2eadc" />
+          <path d="M43,210 Q51.5,198 60,210 Z" fill="#f09d51" />
+          <circle cx="51" cy="205" r="1.3" fill="#fff6d6" />
+        </g>
+
+        <!-- Unlockable: Woodland Hedgehog (Detailed Spines & Snout) -->
+        <g id="comp-hedgehog" style="display:none; cursor:pointer;" onclick="tapCompanion('hedgehog')">
+          <ellipse cx="83" cy="222" rx="12" ry="2.5" fill="#132417" opacity="0.55" />
+          <path d="M71,220 C71,211 86,210 90,216 L95,218.5 L89,221 Z" fill="#594335" />
+          <path d="M74,215 L72,212 M78,213 L77,210 M82,213 L82,210 M86,214 L87,211" stroke="#33251c" stroke-width="1.1" stroke-linecap="round" />
+          <path d="M87,216 L95,218.5 L88,221 C86,219 86,217 87,216 Z" fill="#d6be9e" />
+          <circle cx="95.2" cy="218.5" r="1.2" fill="#17110d" />
+          <circle cx="90.2" cy="217.3" r="1.1" fill="#17110d" />
+        </g>
+
+        <!-- Unlockable: Sleeping Moss Nest (Under Bramble) -->
+        <g id="decor-nest" style="display:none;">
+          <ellipse cx="168" cy="196" rx="38" ry="12" fill="#355e3b" stroke="#669c6d" stroke-width="1.6" />
+          <ellipse cx="168" cy="196" rx="25" ry="7" fill="#487a4f" />
+        </g>
+
+        <!-- BRAMBLE THE DEER (Majestic Anatomical Stag/Fawn + Legendary White Coat Support) -->
+        <g id="deer-group" onclick="petDeer()">
+          <ellipse id="white-stag-aura" cx="168" cy="146" rx="56" ry="48" fill="url(#whiteAura)" style="display:none;" />
+          <ellipse cx="172" cy="195" rx="32" ry="5" fill="#132417" opacity="0.6" />
+
+          <!-- Far Legs -->
+          <path d="M153,162 L150,178 L152,193 L149,193 L148,178 L150,162 Z" id="deer-leg-fl" fill="#8f4c22" />
+          <path d="M185,161 L188,176 L185,193 L182,193 L184,176 L181,161 Z" id="deer-leg-bl" fill="#8f4c22" />
+
+          <!-- Sculpted Torso, Chest & Haunch -->
+          <path d="M144,149 C144,138 158,136 174,137 C189,138 200,142 199,154 C198,164 186,166 172,165 C156,164 144,160 144,149 Z" fill="url(#deerCoatGrad)" />
+          <path d="M196,143 C201,144 203,152 197,156 C195,152 195,147 196,143 Z" fill="#faf4ea" />
+          <path d="M198,144 L205,141 L201,149 Z" id="deer-tail" fill="#b86b35" />
+
+          <!-- Near Legs -->
+          <path d="M159,163 L157,179 L158,195 L155,195 L154,179 L155,163 Z" id="deer-leg-fr" fill="#b86b35" />
+          <path d="M191,160 L195,176 L192,195 L189,195 L191,176 L187,160 Z" id="deer-leg-br" fill="#b86b35" />
+          <rect x="154.5" y="193" width="3.5" height="2.5" rx="0.8" fill="#2b211a" />
+          <rect x="188.5" y="193" width="3.5" height="2.5" rx="0.8" fill="#2b211a" />
+
+          <!-- Fawn Spots -->
+          <g id="deer-spots" opacity="0.85">
+            <circle cx="163" cy="144" r="1.7" fill="#faf2e4" />
+            <circle cx="171" cy="142" r="1.9" fill="#faf2e4" />
+            <circle cx="180" cy="144" r="1.8" fill="#faf2e4" />
+            <circle cx="188" cy="146" r="1.6" fill="#faf2e4" />
+            <circle cx="167" cy="149" r="1.6" fill="#faf2e4" />
+            <circle cx="176" cy="149" r="1.7" fill="#faf2e4" />
+            <circle cx="185" cy="151" r="1.5" fill="#faf2e4" />
+          </g>
+
+          <!-- Regal Neck & Chest Mane -->
+          <path d="M144,148 C142,135 141,123 142,115 L152,116 C153,126 155,137 157,147 Z" fill="url(#deerNeckGrad)" />
+          <path d="M142,132 C140,138 141,145 145,150 C146,144 145,138 142,132 Z" id="deer-chest-ruff" fill="#efe2ce" />
+
+          <!-- Sculpted Noble Head & Tapered Muzzle -->
+          <path d="M141,115 C142,109 150,108 153,113 C154,117 151,121 146,122 L134,124 C131,124 130,121 132,119 L141,115 Z" id="deer-head" fill="#c87b42" />
+          <path d="M133,121 L138,120 L139,123.5 L133,124 Z" fill="#f7efe2" />
+          <circle cx="131.5" cy="121.2" r="1.7" id="deer-nose" fill="#241913" />
+
+          <!-- Leaf-Shaped Alert Ears -->
+          <path d="M150,111 C154,104 161,102 162,105 C161,109 156,112 151,113 Z" id="deer-ear-r" fill="#c87b42" />
+          <path d="M147,110 C148,103 153,99 155,101 C155,105 152,109 148,111 Z" id="deer-ear-l" fill="#9c5527" />
+
+          <!-- Branched Royal Antlers (Unlock at Bond Lv 3+) -->
+          <g id="deer-antlers" style="display:none;" stroke="#ead9bd" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M147,110 C148,101 146,92 141,85 M146,102 L139,98 M145,94 L138,90 M144,89 L149,83" />
+            <path d="M143,110 C142,101 139,93 135,87 M141,97 L135,94" opacity="0.85" />
+          </g>
+
+          <!-- Expressive Eye -->
+          <ellipse cx="143" cy="115.5" rx="2.3" ry="1.8" fill="#1a120d" />
+          <circle cx="142.3" cy="114.9" r="0.75" fill="#ffffff" />
+        </g>
+
+        <!-- HOUSEHOLD PACK TRIO -->
+        <g id="comp-honey" style="display:none; cursor:pointer;" onclick="tapCompanion('honey')">
+          <ellipse cx="226" cy="229" rx="14" ry="2.6" fill="#132417" opacity="0.55" />
+          <rect x="218" y="218" width="3.2" height="11" rx="1.4" fill="#9e5316" />
+          <rect x="232" y="218" width="3.2" height="11" rx="1.4" fill="#9e5316" />
+          <path d="M237,212 Q244,207 245,212 Q241,215 237,214 Z" fill="#d47a2a" />
+          <path d="M214,214 C214,207 224,206 235,208 C239,209 240,215 236,218 C229,220 217,220 214,214 Z" fill="url(#cockerGrad)" />
+          <circle cx="215" cy="204" r="6.2" fill="#d47a2a" />
+          <ellipse cx="209.5" cy="206" rx="4.2" ry="3.2" fill="#de8737" />
+          <path d="M217,202 C221,204 222,213 218,216 C215,215 215,207 217,202 Z" fill="#96490e" />
+          <circle cx="206" cy="205.5" r="1.3" fill="#1a120d" />
+          <circle cx="212.5" cy="203" r="1.3" fill="#1a120d" />
+        </g>
+
+        <g id="comp-cloud" style="display:none; cursor:pointer;" onclick="tapCompanion('cloud')">
+          <ellipse cx="261" cy="229" rx="12" ry="2.4" fill="#132417" opacity="0.55" />
+          <path d="M267,217 C272,211 268,205 262,208 C264,211 265,214 267,217 Z" fill="#f7f1e6" />
+          <ellipse cx="260" cy="220" rx="10.5" ry="7.8" fill="#f2eadc" />
+          <circle cx="254" cy="215" r="7.8" fill="#fffcf7" />
+          <polygon points="249,210 250.5,203.5 253.5,208.5" fill="#e6dac8" />
+          <polygon points="255,208.5 257.5,203.5 259.5,209.5" fill="#e6dac8" />
+          <polygon points="248,215 244,216.8 248.5,218" fill="#fffcf7" />
+          <circle cx="244" cy="216.6" r="1.1" fill="#1a1410" />
+          <circle cx="251.5" cy="214.2" r="1.2" fill="#1a1410" />
+        </g>
+
+        <g id="comp-fable" style="display:none; cursor:pointer;" onclick="tapCompanion('fable')">
+          <ellipse cx="297" cy="229" rx="15" ry="2.6" fill="#132417" opacity="0.55" />
+          <rect x="288" y="218" width="3.4" height="11" rx="1.5" fill="#f5f2ed" />
+          <rect x="303" y="218" width="3.4" height="11" rx="1.5" fill="#593a24" />
+          <path d="M308,211 Q315,206 316,211 Q312,214 308,213 Z" fill="#f5f2ed" />
+          <path d="M284,214 C284,207 295,206 306,208 C310,209 311,215 307,218 C300,220 287,220 284,214 Z" fill="#f7f4ef" />
+          <path d="M292,207 C298,207 303,208 304,213 C299,215 294,214 292,207 Z" fill="#593a24" />
+          <circle cx="285" cy="204" r="6.4" fill="#593a24" />
+          <ellipse cx="279.5" cy="206" rx="4.4" ry="3.2" fill="#f7f4ef" />
+          <path d="M287,202 C291,204 292,214 288,217 C285,216 285,207 287,202 Z" fill="#4a2f1c" />
+          <circle cx="276" cy="205.5" r="1.3" fill="#1a120d" />
+          <circle cx="282.5" cy="203" r="1.3" fill="#1a120d" />
+        </g>
+
+        <!-- Rain Layer -->
+        <g id="rain-layer" stroke="#9ecae1" stroke-width="1.2" opacity="0.55" style="display:none;">
+          <line x1="65" y1="30" x2="58" y2="50" />
+          <line x1="155" y1="22" x2="148" y2="42" />
+          <line x1="245" y1="45" x2="238" y2="65" />
+          <line x1="335" y1="25" x2="328" y2="45" />
+          <line x1="110" y1="95" x2="103" y2="115" />
+          <line x1="295" y1="95" x2="288" y2="115" />
+        </g>
+      </svg>
+    </div>
+
+    <!-- CLEAN ACTION BAR BELOW GLADE (ZERO CANVAS OVERLAP) -->
+    <div class="row" style="margin-bottom:10px; background:var(--bg-card-soft); padding:8px 10px; border-radius:12px; border:1px solid var(--border);">
+      <span style="font-size:0.78rem; color:var(--accent); font-weight:600;" id="focus-quest-badge">🌄 Walk a dog</span>
+      <div class="row" style="gap:6px;">
+        <button class="btn btn-sm btn-primary" onclick="petDeer()" id="pet-btn">🩷 Pet (0/3)</button>
+        <button class="btn btn-sm" onclick="toggleSleep()" id="sleep-btn">🌙 Tuck In</button>
+        <button class="btn btn-sm" onclick="cycleAudio()" id="audio-btn">🔇 Sound</button>
+      </div>
+    </div>
+
+    <!-- Bond & Fullness Bars -->
+    <div class="grid-2" style="margin-bottom:10px;">
+      <div class="item-card">
+        <div class="row">
+          <span style="font-size:0.82rem;">✨ <strong>Bond Lv.<span id="bond-lv">1</span></strong></span>
+          <span style="font-size:0.78rem; color:var(--text-muted);"><span id="bond-xp">0</span>/100</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill bar-warm" id="bond-bar" style="width:0%"></div></div>
+      </div>
+      <div class="item-card">
+        <div class="row">
+          <span style="font-size:0.82rem;">🌿 <strong>Fullness</strong></span>
+          <span style="font-size:0.78rem; color:var(--text-muted);"><span id="fullness-val">100</span>%</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" id="fullness-bar" style="width:100%"></div></div>
+      </div>
+    </div>
+
+    <!-- Forage Treat Buttons -->
+    <div class="grid-2" style="grid-template-columns: repeat(4, 1fr);">
+      <button class="btn btn-sm" onclick="feedTreat('clover')">🍀 <span id="inv-clover">2</span></button>
+      <button class="btn btn-sm" onclick="feedTreat('dandelion')">🌼 <span id="inv-dandelion">1</span></button>
+      <button class="btn btn-sm" onclick="feedTreat('bilberry')">🫐 <span id="inv-bilberry">1</span></button>
+      <button class="btn btn-sm" onclick="feedTreat('acorn')">🌰 <span id="inv-acorn">0</span></button>
+    </div>
+  </div>
+
+  <!-- NAVIGATION TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-quests" onclick="switchTab('quests')">🌿<br>Quests</button>
+    <button class="tab-btn" id="tab-steps" onclick="switchTab('steps')">👣<br>Trail &amp; Pack</button>
+    <button class="tab-btn" id="tab-mood" onclick="switchTab('mood')">📓<br>Almanac</button>
+    <button class="tab-btn" id="tab-lore" onclick="switchTab('lore')">☀️<br>Deities &amp; Lore</button>
+    <button class="tab-btn" id="tab-glade" onclick="switchTab('glade')">🏡<br>Glade &amp; Friends</button>
+  </div>
+
+  <!-- TAB 1: QUESTS -->
+  <div class="section active card" id="sec-quests">
+    <div class="row" style="margin-bottom:8px;">
+      <h2>Daily Woodland Quests</h2>
+      <button class="btn btn-sm" onclick="toggleRestShield()" id="rest-btn">🛡️ Rest Shield: OFF</button>
+    </div>
+    <p class="muted" id="quest-subtitle">Complete gentle daily rhythms to earn Forage Leaves and treats for Bramble.</p>
+    <div id="quest-list"></div>
+    <div class="row" style="margin-top:10px;">
+      <input type="text" id="new-quest-input" placeholder="Add a gentle habit (e.g. Herbal tea, Stretch)..." />
+      <button class="btn btn-primary" onclick="addQuest()">+ Add</button>
+    </div>
+  </div>
+
+  <!-- TAB 2: TRAIL & PACK -->
+  <div class="section card" id="sec-steps">
+    <h2>Woodland Trail &amp; Pack Walks</h2>
+    <p class="muted">Log walks with Honey, Cloud &amp; Fable or gentle daily steps—every walk automatically forages wild treats and earns Forage Leaves.</p>
+    <div class="item-card" style="margin-bottom:10px;">
+      <div class="row">
+        <span>Today's Steps: <strong id="steps-today">0</strong> / 6,000</span>
+        <span class="pill">+1 🌿 per 1,500 steps + Forage</span>
+      </div>
+      <div class="bar-bg"><div class="bar-fill" id="steps-bar" style="width:0%"></div></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:8px;">
+      <button class="btn" onclick="logSteps(250)">+250 Steps 🍀</button>
+      <button class="btn" onclick="logSteps(500)">+500 Steps 🌼</button>
+      <button class="btn" onclick="logSteps(1000)">+1,000 Steps 🫐</button>
+      <button class="btn btn-warm" onclick="logDogWalk()">🐕 Pack Walk (+2,500) 🌰</button>
+    </div>
+    <div class="item-card">
+      <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:6px;">Sync Exact Steps (e.g. from Pixel Watch)</label>
+      <div class="row" style="flex-wrap:nowrap;">
+        <input type="number" id="custom-steps-input" min="1" step="50" placeholder="Enter steps to add (e.g. 250, 500, 3400)..." />
+        <button class="btn btn-primary" style="white-space:nowrap;" onclick="addCustomSteps()">+ Add Steps</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: MOOD, BODY & BAROMETRIC ALMANAC -->
+  <div class="section card" id="sec-mood">
+    <h2>Body, Barometer &amp; Wildlife Augury</h2>
+    <p class="muted">Track energy, joint/migraine comfort, atmospheric pressure drops, and wildlife omens.</p>
+    <div class="item-card" id="pressure-alert-box" style="margin-bottom:10px; display:none;"></div>
+    <label style="font-size:0.8rem; color:var(--text-muted);">Energy &amp; Body Tags</label>
+    <div class="chip-group" id="body-chips">
+      <span class="chip" onclick="toggleChip(this)">Steady Energy</span>
+      <span class="chip" onclick="toggleChip(this)">Fatigue / Flare</span>
+      <span class="chip" onclick="toggleChip(this)">Headache / Migraine</span>
+      <span class="chip" onclick="toggleChip(this)">Joint Ache</span>
+      <span class="chip" onclick="toggleChip(this)">Calm &amp; Grounded</span>
+      <span class="chip" onclick="toggleChip(this)">Brain Fog</span>
+    </div>
+    <label style="font-size:0.8rem; color:var(--text-muted);">Wildlife Omen / Augury Sighting</label>
+    <select id="augury-select" style="margin:6px 0 8px;">
+      <option value="">No sighting logged</option>
+      <option value="Hare — Liminality, dawn thresholds & Andraste's sacred sign">🐇 Hare (Liminality &amp; Dawn Thresholds)</option>
+      <option value="Raven — Ancestral memory, Brân the Blessed & watchful wisdom">🪶 Raven (Ancestral Memory &amp; Wisdom)</option>
+      <option value="Buzzard / Hawk — High perspective & Dobunni sky-watch">🦅 Buzzard / Hawk (High Perspective)</option>
+      <option value="Deer / Stag — Annwn messenger & Elen's ancient trackways">🦌 Deer / Stag (Otherworld Messenger)</option>
+      <option value="Robin / Wren — Seasonal turning & hearth protection">🐦 Robin / Wren (Seasonal Turning)</option>
+      <option value="Owl — Night clarity & Cailleach's winter stillness">🦉 Owl (Night Clarity)</option>
+    </select>
+    <textarea id="almanac-note" rows="2" placeholder="Notes on weather pressure, pain patterns, or woodland reflections..."></textarea>
+    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="saveAlmanacEntry()">Save Almanac Entry (+1 🌿)</button>
+    <div id="pressure-chart-wrap" style="margin-top:12px;"></div>
+    <div id="almanac-history" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- TAB 4: DEITIES, WHEEL OF THE YEAR & CODEX -->
+  <div class="section card" id="sec-lore">
+    <h2>Deities of the Hour, Day &amp; Wheel</h2>
+    <p class="muted">Grounded in Romano-British inscriptions, Welsh Mabinogion lore, and Insular Celtic seasonal traditions.</p>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div class="item-card" id="time-deity-card"></div>
+      <div class="item-card" id="day-deity-card"></div>
+    </div>
+    <h3>☀️ 8-Fold Wheel of the Year</h3>
+    <div style="text-align:center; margin:8px 0;">
+      <svg viewBox="0 0 260 260" width="225" height="225" style="max-width:100%;">
+        <circle cx="130" cy="130" r="108" fill="#101b14" stroke="#365440" stroke-width="2" />
+        <circle cx="130" cy="130" r="62" fill="none" stroke="#2a4032" stroke-width="1.5" stroke-dasharray="4 3" />
+        <line x1="130" y1="22" x2="130" y2="238" stroke="#2a4032" stroke-width="1.5" />
+        <line x1="22" y1="130" x2="238" y2="130" stroke="#2a4032" stroke-width="1.5" />
+        <line x1="54" y1="54" x2="206" y2="206" stroke="#2a4032" stroke-width="1.5" />
+        <line x1="206" y1="54" x2="54" y2="206" stroke="#2a4032" stroke-width="1.5" />
+        <g id="wheel-nodes"></g>
+        <circle cx="130" cy="130" r="26" fill="#1b2c21" stroke="#e4b567" stroke-width="1.5" />
+        <text x="130" y="134" text-anchor="middle" fill="#e4b567" font-size="11" font-weight="bold">AWEN</text>
+      </svg>
+    </div>
+    <div class="item-card" id="sabbat-detail" style="margin-bottom:12px;"></div>
+    <div class="item-card" style="margin-bottom:12px;">
+      <h3>💧 Sulis's Sacred Spring &amp; 20-Tree Ogham Grove</h3>
+      <p class="muted">Cast a votive pebble into the warm waters of Aquae Sulis or draw from the complete 20-stave Beth-Luis-Nion Ogham alphabet.</p>
+      <div class="row">
+        <button class="btn btn-warm" onclick="castSpringIntention()">🌊 Cast Pebble in Spring</button>
+        <button class="btn btn-primary" onclick="drawOghamTriad()">🌿 Draw Ogham Stave</button>
+      </div>
+      <div id="oracle-output" style="margin-top:10px; font-size:0.84rem; color:#e6f2ea;"></div>
+    </div>
+    <h3>📜 Regional Brythonic &amp; Celtic Codex</h3>
+    <div id="codex-list" style="margin-top:6px;"></div>
+  </div>
+
+  <!-- TAB 5: GLADE SCENERY & ANIMAL COMPANIONS -->
+  <div class="section card" id="sec-glade">
+    <div class="row" style="margin-bottom:6px;">
+      <h2>Glade Scenery &amp; Companions</h2>
+      <span class="pill"><strong id="leaves-shop">0</strong> 🌿 Available</span>
+    </div>
+    <p class="muted">Unlock woodland wildlife, your household spaniel &amp; Pomeranian pack, sacred Brythonic relics, and Bramble's legendary coat.</p>
+    <div class="item-card" id="coat-selector-card" style="margin-bottom:12px; border-color:var(--accent-warm);"></div>
+    <h3 style="margin-top:8px;">🐾 Woodland Wildlife &amp; Pack Companions</h3>
+    <div class="grid-2" id="companion-grid" style="margin-bottom:12px;"></div>
+    <h3>🌲 Glade Scenery &amp; Sacred Relics</h3>
+    <div class="grid-2" id="shop-grid"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const TODAY_STR = new Date().toISOString().slice(0, 10);
+    const DEFAULT_STATE = {
+      bondLv: 1, bondXp: 0, fullness: 100, leaves: 3, sleeping: false, restShield: false,
+      stepsToday: 0, petDate: TODAY_STR, petsToday: 0,
+      weather: { temp: null, pressure: null, prevPressure: null, rain: false },
+      coat: 'woodland',
+      inv: { clover: 2, dandelion: 1, bilberry: 1, acorn: 0 },
+      unlocked: ['pond'], companions: [],
+      quests: [
+        { id: 1, text: 'Walk a dog', lowSpoon: 'Step outside for 2 mins fresh air', done: false, reward: 2 },
+        { id: 2, text: 'Drink a full glass of water', lowSpoon: 'Sip water or herbal tea', done: false, reward: 1 },
+        { id: 3, text: '5 mins quiet breathing or reading', lowSpoon: '5 mins eyes-closed rest', done: false, reward: 1 },
+        { id: 4, text: 'Evening body & migraine check-in', lowSpoon: 'Quick body comfort check-in', done: false, reward: 1 }
+      ],
+      almanac: []
+    };
+
+    let state = JSON.parse(localStorage.getItem('bramble_glade_v2') || 'null') || structuredClone(DEFAULT_STATE);
+    state = { ...structuredClone(DEFAULT_STATE), ...state };
+    if (state.unlocked) state.unlocked = state.unlocked.map(id => id === 'moss_nest' ? 'nest' : id);
+    if (!Array.isArray(state.companions)) state.companions = [];
+    if (state.petDate !== TODAY_STR) { state.petDate = TODAY_STR; state.petsToday = 0; }
+
+    const COMPANION_ITEMS = [
+      { id: 'honey', name: 'Honey (Working Cocker)', icon: '🐕', desc: 'Golden-red spaniel bounding by the path', cost: 4 },
+      { id: 'cloud', name: 'Cloud (Pomeranian)', icon: '☁️', desc: 'Fluffy cream companion by the moss nest', cost: 4 },
+      { id: 'fable', name: 'Fable (Springer Spaniel)', icon: '🐶', desc: 'Liver-and-white pup ready for trail drills', cost: 4 },
+      { id: 'fox', name: 'Red Fox', icon: '🦊', desc: 'Clever twilight visitor on the grassy bank', cost: 6 },
+      { id: 'hedgehog', name: 'Woodland Hedgehog', icon: '🦔', desc: 'Forages quietly beside the toadstools', cost: 5 },
+      { id: 'owl', name: 'Barn Owl', icon: '🦉', desc: 'Silent night watcher perched in the boughs', cost: 7 }
+    ];
+
+    const SHOP_ITEMS = [
+      { id: 'pond', name: 'Wildlife Pond', icon: '🪷', desc: 'Tap to ripple the water lilies', cost: 4 },
+      { id: 'stones', name: 'Mossy Stones', icon: '🪨', desc: 'Stepping stones in the grass', cost: 5 },
+      { id: 'mushrooms', name: 'Glowing Mushrooms', icon: '🍄', desc: 'Tap to pulse warm twilight glow', cost: 5 },
+      { id: 'nest', name: 'Sleeping Moss Nest', icon: '🛏️', desc: 'Soft moss bed under Bramble', cost: 6 },
+      { id: 'sulis', name: "Sulis's Sacred Shrine", icon: '🏛️', desc: 'Dobunni stone shrine by the water', cost: 8 },
+      { id: 'nodens', name: "Nodens' Bronze Hound", icon: '🗿', desc: 'Lydney healing hound figurine', cost: 8 },
+      { id: 'cucullati', name: 'Genii Cucullati Trio', icon: '🧥', desc: 'Three hooded Cotswold spirits', cost: 10 }
+    ];
+
+    const TIME_DEITIES = [
+      { start: 5, end: 9, icon: '🌅', title: 'Dawn Threshold', deity: 'Brigantia & Brigid', note: 'Goddesses of first light, sacred springs, and the waking hearth-flame across northern Britain and Ireland.' },
+      { start: 9, end: 13, icon: '☀️', title: 'Morning Ascent', deity: 'Belenus ("The Bright One")', note: 'Pan-Celtic solar and healing deity invoked across Britain and Gaul for warmth, clarity, and vitality.' },
+      { start: 13, end: 17, icon: '🌿', title: 'High Afternoon', deity: 'Lleu Llaw Gyffes & Lugh', note: 'Masters of focused craft, keen sight, and steady skill in the Mabinogion and Irish myth.' },
+      { start: 17, end: 21, icon: '🕯️', title: 'Dusk & Liminal Hour', deity: 'Rhiannon & Gwyn ap Nudd', note: 'Twilight riders of Welsh lore—Rhiannon of unhurried patience, and Gwyn ap Nudd of misty hill thresholds.' },
+      { start: 21, end: 5, icon: '🌙', title: 'Night & Deep Rest', deity: 'Nodens & The Cailleach', note: 'Nodens of Lydney’s Severn sanctuary (healing sleep-dreams) and the Cailleach of starry winter stillness.' }
+    ];
+
+    const DAY_DEITIES = [
+      { day: 'Sunday', icon: '🌞', deity: 'Sulis & Belenus', lore: 'Solar radiance and the steaming mineral waters of Aquae Sulis (Bath).' },
+      { day: 'Monday', icon: '🌙', deity: 'Arianrhod ("Silver Wheel")', lore: 'Welsh figure of the turning stars, tides, and cyclic lunar rhythm.' },
+      { day: 'Tuesday', icon: '🛡️', deity: 'Cocidius & Andraste', lore: 'Brythonic guardians of wild woodland boundaries, courage, and protection.' },
+      { day: 'Wednesday', icon: '🪶', deity: 'Brân the Blessed & Ogma', lore: 'Keepers of memory, eloquence, ravens, and poetic wisdom (Awen).' },
+      { day: 'Thursday', icon: '⚡', deity: 'Taranis & Maponos', lore: 'Sky-thunder and youthful vitality echoed across Romano-British altars.' },
+      { day: 'Friday', icon: '💧', deity: 'Sulis & Coventina', lore: 'Sacred springs, emotional restoration, and gentle waters of the southwest & north.' },
+      { day: 'Saturday', icon: '🪨', deity: 'Cailleach & Genii Cucullati', lore: 'Deep earth, winter endurance, and hooded spirits of quiet thresholds.' }
+    ];
+
+    const SABBATS = [
+      { id: 'samhain', name: 'Samhain / Nos Galan Gaeaf', date: '31 Oct – 1 Nov', angle: 315, icon: '🕯️', lore: 'The Celtic New Year and threshold of the dark half of the year. In Welsh tradition (Nos Galan Gaeaf), spirits walk thin boundaries and bonfires ward the night.', practice: 'Light a candle at dusk, honour ancestors, and keep evening rhythms gentle.' },
+      { id: 'yule', name: 'Winter Solstice / Alban Arthan', date: '21 Dec', angle: 0, icon: '❄️', lore: 'Shortest day and rebirth of the sun. Alban Arthan ("Light of Arthur/Bear") is a modern Druidic name paired with ancient solstice alignments across Britain.', practice: 'Rest deeply through long nights and welcome the first returning light.' },
+      { id: 'imbolc', name: 'Imbolc / Gŵyl Fair', date: '1 – 2 Feb', angle: 45, icon: '🌱', lore: 'Gaelic quarter-day marking early lambing and the quickening of springs, linked to Brigid and northern Brythonic sovereignty goddess Brigantia.', practice: 'Tend sacred water, cleanse your space, and note first snowdrops.' },
+      { id: 'ostara', name: 'Spring Equinox / Alban Eilir', date: '20 Mar', angle: 90, icon: '🐇', lore: 'Equal day and night as the earth warms. Hares—sacred to the Iceni deity Andraste—become active across open fields.', practice: 'Observe budding hazel and hawthorn along local hedgerows.' },
+      { id: 'beltane', name: 'Beltane / Calan Mai', date: '1 May', angle: 135, icon: '🌸', lore: 'Threshold of the bright summer half of the year. Celebrated across Gaelic and Brythonic lands (Calan Mai in Wales) with hawthorn blossom and protective fires.', practice: 'Step outside at dawn and celebrate vitality and movement.' },
+      { id: 'litha', name: 'Summer Solstice / Alban Hefin', date: '21 Jun', angle: 180, icon: '☀️', lore: 'Peak solar power at midsummer. Ancient British monuments align with the solstice sunrise, celebrating abundance and clarity.', practice: 'Soak in early morning daylight and gather herbs.' },
+      { id: 'lughnasadh', name: 'Lughnasadh / Calan Awst', date: '1 Aug', angle: 225, icon: '🌾', lore: 'First harvest festival named for Lugh (Gaelic) and Lleu Llaw Gyffes (Welsh), honouring skill, craft, and hill gatherings.', practice: 'Take pride in a craft or skill you have nurtured this year.' },
+      { id: 'mabon', name: 'Autumn Equinox / Alban Elfed', date: '22 Sep', angle: 270, icon: '🌰', lore: 'Second harvest and balance before winter descent. Oak acorns and hazel nuts ripen across British woodlands.', practice: 'Log gratitude for what sustained you and prepare for slower days.' }
+    ];
+
+    const OGHAM_20 = [
+      { letter: 'ᚁ Beith (Birch)', meaning: 'New beginnings, purification, pioneer resilience in cleared ground.' },
+      { letter: 'ᚂ Luis (Rowan)', meaning: 'Protection at thresholds, keen discernment, bright berries in autumn.' },
+      { letter: 'ᚃ Fearn (Alder)', meaning: 'Bridge between water and land, endurance in damp ground, quiet strength.' },
+      { letter: 'ᚄ Saille (Willow)', meaning: 'Flexibility in wind, lunar tides, soothing waterside restoration.' },
+      { letter: 'ᚅ Nion (Ash)', meaning: 'Deep roots and wide canopy, interconnection between inner and outer worlds.' },
+      { letter: 'ᚆ Uath (Hawthorn)', meaning: 'Hedge-boundary guardianship, patience before flowering, respect for wildness.' },
+      { letter: 'ᚇ Dair (Oak)', meaning: 'Sovereignty, shelter, long-lived endurance through seasonal storms.' },
+      { letter: 'ᚈ Tinne (Holly)', meaning: 'Winter evergreen courage, holding steady when the woodland sleeps.' },
+      { letter: 'ᚉ Coll (Hazel)', meaning: 'Concentrated poetic wisdom (Awen), nine hazels over the well of Segais.' },
+      { letter: 'ᚊ Ceirt (Apple)', meaning: 'Nourishment, Avalon’s healing orchards, gentle sweetness.' },
+      { letter: 'ᚋ Muin (Bramble / Vine)', meaning: 'Tangled protection, wild harvest, thriving along hedgerow margins.' },
+      { letter: 'ᚌ Gort (Ivy)', meaning: 'Spiral persistence, binding support, green life through cold months.' },
+      { letter: 'ᚍ nGéadal (Reed)', meaning: 'Breath, music, hollow stem carrying wind into song.' },
+      { letter: 'ᚎ Straif (Blackthorn)', meaning: 'Unavoidable winter truth, sharp thorns guarding late sloe berries.' },
+      { letter: 'ᚏ Ruis (Elder)', meaning: 'Completion, regeneration, medicine at the edge of the garden.' },
+      { letter: 'ᚐ Ailm (Silver Fir / Pine)', meaning: 'High perspective, clear mountain air, evergreen clarity.' },
+      { letter: 'ᚑ Onn (Gorse / Furze)', meaning: 'Golden spark even in winter—"when gorse is out of bloom, kissing’s out of fashion."' },
+      { letter: 'ᚒ Úr (Heather)', meaning: 'Moorland resilience, bees’ late honey, quiet beauty on open hills.' },
+      { letter: 'ᚓ Eadhadh (Aspen)', meaning: 'Whispering leaves, sensitivity to subtle shifts in the wind.' },
+      { letter: 'ᚔ Iodhadh (Yew)', meaning: 'Ancestral continuity, deep time, stillness across centuries.' }
+    ];
+
+    const CODEX_ENTRIES = [
+      { title: 'Sulis of Aquae Sulis (Dobunni & Durotriges, Bath/Somerset)', text: 'Worshipped at the hot mineral springs of Bath. Over 130 inscribed pewter tablets survive—petitions cast into the steaming waters by local Britons and travellers.' },
+      { title: 'Nodens & the Hounds of Lydney (Severn Estuary)', text: 'Venerated at a hilltop sanctuary overlooking the Severn, linked to healing, therapeutic sleep-dreams, and bronze hound votives.' },
+      { title: 'The Genii Cucullati (Dobunnic Cotswolds & Southwest)', text: 'Trios of small hooded figures carved in limestone across Gloucestershire and Somerset, associated with quiet protection and passage between worlds.' },
+      { title: 'Dumnonii Sacred Waters & Headlands (Devon & Cornwall)', text: 'Southwest Brythonic devotion centred on coastal headlands, holy wells, and tin-streamed river valleys rather than monumental stone temples.' },
+      { title: 'Brigantia of the Brigantes (Northern Britain)', text: 'Tutelary sovereignty goddess of the northern federation, honoured across Yorkshire and Cumbria as protector of high fells and rivers.' },
+      { title: 'White Stags & Annwn in the Mabinogion', text: 'In Welsh tradition, white stags with red ears mark the border of Annwn (the Otherworld), guiding travellers toward transformation.' }
+    ];
+
+    let selectedSabbatId = 'samhain';
+
+    function getCurrentTimeDeity() {
+      const h = new Date().getHours();
+      if (h >= 5 && h < 9) return TIME_DEITIES[0];
+      if (h >= 9 && h < 13) return TIME_DEITIES[1];
+      if (h >= 13 && h < 17) return TIME_DEITIES[2];
+      if (h >= 17 && h < 21) return TIME_DEITIES[3];
+      return TIME_DEITIES[4];
+    }
+
+    function getCurrentDayDeity() { return DAY_DEITIES[new Date().getDay()]; }
+    function saveState() { localStorage.setItem('bramble_glade_v2', JSON.stringify(state)); renderAll(); }
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.style.display = 'block';
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => { t.style.display = 'none'; }, 2600);
+    }
+
+    function addBondXp(pts) {
+      state.bondXp += pts;
+      while (state.bondXp >= 100) { state.bondXp -= 100; state.bondLv += 1; showToast(`✨ Bramble reached Bond Level ${state.bondLv}!`); }
+    }
+
+    function petDeer() {
+      const today = new Date().toISOString().slice(0, 10);
+      if (state.petDate !== today) { state.petDate = today; state.petsToday = 0; }
+      state.sleeping = false;
+      const deer = document.getElementById('deer-group');
+      deer.classList.remove('hop'); void deer.offsetWidth; deer.classList.add('hop');
+      if (state.petsToday < 3) { state.petsToday += 1; addBondXp(4); showToast(`🩷 Bramble leans into your hand (+4 Bond · ${state.petsToday}/3 today)`); }
+      else showToast('🩷 Bramble purrs softly (daily petting Bond cap 3/3 reached)');
+      saveState();
+    }
+
+    function tapCompanion(id) {
+      const el = document.getElementById(`comp-${id}`);
+      if (el) { el.classList.remove('hop'); void el.offsetWidth; el.classList.add('hop'); }
+      const lines = {
+        honey: '🐕 Honey wags her tail and brings you a mossy stick!',
+        cloud: '☁️ Cloud does a fluffy spin beside the moss nest!',
+        fable: '🐶 Fable bounces eagerly—ready for scent work!',
+        fox: '🦊 The Red Fox flicks its ears at the edge of the trees.',
+        hedgehog: '🦔 The Hedgehog snuffles happily around the toadstools.',
+        owl: '🦉 The Barn Owl turns its head silently in the twilight boughs.'
+      };
+      showToast(lines[id] || '🐾 Your companion greets you!');
+    }
+
+    function tapScenery(id) {
+      if (id === 'pond') { const r = document.getElementById('pond-ripple'); if (r) { r.setAttribute('rx', '34'); setTimeout(() => r.setAttribute('rx', '22'), 700); } showToast('🪷 Ripples spread gently across the clear forest pool...'); }
+      else if (id === 'mushrooms') { const m = document.getElementById('decor-mushrooms'); if (m) { m.classList.remove('mushroom-pulse'); void m.offsetWidth; m.classList.add('mushroom-pulse'); } showToast('🍄 The woodland toadstools pulse with warm amber light.'); }
+      else if (id === 'sulis') showToast('🏛️ Sulis’s shrine radiates gentle mineral warmth.');
+      else if (id === 'nodens') showToast('🗿 Nodens’ bronze hound watches peacefully over your rest.');
+      else if (id === 'cucullati') showToast('🧥 The three hooded Genii Cucullati guard the glade threshold.');
+    }
+
+    function toggleSleep() { state.sleeping = !state.sleeping; showToast(state.sleeping ? '🌙 Bramble curls up in the mossy glade' : '🌄 Bramble wakes and stretches'); saveState(); }
+
+    function feedTreat(type) {
+      if ((state.inv[type] || 0) <= 0) { showToast('None left — complete quests or walk the trail to forage!'); return; }
+      state.inv[type] -= 1; state.fullness = Math.min(100, state.fullness + 15); addBondXp(8);
+      showToast(`🌿 Fed Bramble ${type}! (+8 Bond)`); saveState();
+    }
+
+    function toggleQuest(id) {
+      const q = state.quests.find(x => x.id === id);
+      if (!q) return;
+      q.done = !q.done;
+      if (q.done) {
+        state.leaves += q.reward; addBondXp(10);
+        const treats = ['clover', 'dandelion', 'bilberry', 'acorn'];
+        const pick = treats[Math.floor(Math.random() * treats.length)];
+        state.inv[pick] = (state.inv[pick] || 0) + 1;
+        showToast(`+${q.reward} 🌿 & foraged a ${pick}!`);
+      }
+      saveState();
+    }
+
+    function addQuest() {
+      const inp = document.getElementById('new-quest-input');
+      const txt = inp.value.trim();
+      if (!txt) return;
+      state.quests.push({ id: Date.now(), text: txt, lowSpoon: txt, done: false, reward: 1 });
+      inp.value = ''; saveState();
+    }
+
+    function toggleRestShield() { state.restShield = !state.restShield; showToast(state.restShield ? '🛡️ Low-Spoon Rest Shield ON — gentle flare quests active' : 'Rest Shield turned off'); saveState(); }
+
+    function logSteps(num) {
+      if (!num || num <= 0) return;
+      const prevMilestones = Math.floor(state.stepsToday / 1500);
+      state.stepsToday += num;
+      const newMilestones = Math.floor(state.stepsToday / 1500);
+      const earned = Math.max(0, newMilestones - prevMilestones);
+      const treats = ['clover', 'dandelion', 'bilberry', 'acorn'];
+      const pick = treats[Math.floor(Math.random() * treats.length)];
+      state.inv[pick] = (state.inv[pick] || 0) + 1;
+      if (earned > 0) { state.leaves += earned; addBondXp(earned * 6 + 3); showToast(`👣 +${num.toLocaleString()} steps! +${earned} 🌿 & foraged a wild ${pick}`); }
+      else { addBondXp(3); showToast(`👣 +${num.toLocaleString()} steps! Foraged a wild ${pick} (+3 Bond)`); }
+      saveState();
+    }
+
+    function addCustomSteps() {
+      const inp = document.getElementById('custom-steps-input');
+      const val = parseInt(inp.value, 10);
+      if (!val || val <= 0) { showToast('Enter a valid number of steps first'); return; }
+      inp.value = ''; logSteps(val);
+    }
+
+    function logDogWalk() {
+      logSteps(2500);
+      ['honey', 'cloud', 'fable'].forEach(id => { const el = document.getElementById(`comp-${id}`); if (el && state.companions.includes(id)) { el.classList.remove('hop'); void el.offsetWidth; el.classList.add('hop'); } });
+    }
+
+    function toggleChip(el) { el.classList.toggle('selected'); }
+
+    function saveAlmanacEntry() {
+      const tags = [...document.querySelectorAll('#body-chips .chip.selected')].map(c => c.textContent);
+      const augury = document.getElementById('augury-select').value;
+      const note = document.getElementById('almanac-note').value.trim();
+      if (!tags.length && !augury && !note) { showToast('Select a tag, wildlife omen, or write a short note first'); return; }
+      state.almanac.unshift({ date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }), tags, augury, note, pressure: state.weather.pressure ? parseFloat(state.weather.pressure) : null });
+      state.leaves += 1; addBondXp(6);
+      document.querySelectorAll('#body-chips .chip.selected').forEach(c => c.classList.remove('selected'));
+      document.getElementById('augury-select').value = ''; document.getElementById('almanac-note').value = '';
+      showToast('📓 Saved to Almanac (+1 🌿)'); saveState();
+    }
+
+    function buyDecor(id) {
+      const item = SHOP_ITEMS.find(x => x.id === id);
+      if (!item || state.unlocked.includes(id)) return;
+      if (state.leaves < item.cost) { showToast(`Need ${item.cost} 🌿 Forage Leaves`); return; }
+      state.leaves -= item.cost; state.unlocked.push(id); addBondXp(12);
+      showToast(`✨ Added ${item.name} to Bramble's glade!`); saveState();
+    }
+
+    function buyCompanion(id) {
+      const item = COMPANION_ITEMS.find(x => x.id === id);
+      if (!item || state.companions.includes(id)) return;
+      if (state.leaves < item.cost) { showToast(`Need ${item.cost} 🌿 Forage Leaves`); return; }
+      state.leaves -= item.cost; state.companions.push(id); addBondXp(12);
+      showToast(`🐾 ${item.name} joined the glade!`); saveState();
+    }
+
+    function toggleDeerCoat(mode) {
+      if (mode === 'white' && state.bondLv < 5) { showToast('✨ Reach Bond Lv. 5 (Crowned Hart) to unlock the Legendary White Stag coat!'); return; }
+      state.coat = mode;
+      showToast(mode === 'white' ? '🤍 Bramble shimmers in the Legendary White Stag coat of Annwn!' : '🦌 Bramble wears the classic russet woodland coat.');
+      saveState();
+    }
+
+    function castSpringIntention() {
+      const msgs = [
+        '💧 Ripples widen across Sulis’s spring: "What weighs heavy is given to the water; may clarity return with the tide."',
+        '💧 The spring water settles clear as glass: "Like the Dobunni tablets of Aquae Sulis, your intention is witnessed and released."',
+        '💧 A golden shimmer rises from the deep spring: "Rest without guilt; even sacred rivers pause in quiet pools."'
+      ];
+      document.getElementById('oracle-output').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+      addBondXp(3); saveState();
+    }
+
+    function drawOghamTriad() {
+      const pick = OGHAM_20[Math.floor(Math.random() * OGHAM_20.length)];
+      document.getElementById('oracle-output').innerHTML = `<strong>${pick.letter}</strong><br>${pick.meaning}`;
+      addBondXp(3); saveState();
+    }
+
+    async function syncWeather() {
+      const pill = document.getElementById('weather-pill');
+      pill.textContent = '⏳ Syncing...';
+      try {
+        let lat = 51.29, lon = -2.44;
+        if (navigator.geolocation) { await new Promise(res => { navigator.geolocation.getCurrentPosition(p => { lat = p.coords.latitude; lon = p.coords.longitude; res(); }, () => res(), { timeout: 3500 }); }); }
+        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,surface_pressure,precipitation`);
+        const d = await r.json();
+        const prevP = state.weather.pressure ? parseFloat(state.weather.pressure) : null;
+        const newP = parseFloat(d.current.surface_pressure.toFixed(1));
+        state.weather = { temp: Math.round(d.current.temperature_2m), pressure: newP, prevPressure: prevP, rain: (d.current.precipitation || 0) > 0 };
+        showToast(`⛅ Synced: ${state.weather.temp}°C · ${newP} hPa`); saveState();
+      } catch (e) { pill.textContent = '⛅ Offline Mode'; showToast('Offline — using local woodland sky'); }
+    }
+
+    let audioCtx = null, audioNode = null, audioMode = 0;
+    const AUDIO_MODES = ['🔇 Sound', '🌧️ Rain', '🌊 Stream', '🔥 Hearth'];
+    function cycleAudio() {
+      audioMode = (audioMode + 1) % AUDIO_MODES.length;
+      document.getElementById('audio-btn').textContent = AUDIO_MODES[audioMode];
+      if (audioNode) { try { audioNode.disconnect(); } catch (e) {} audioNode = null; }
+      if (audioMode === 0) return;
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const bufSize = audioCtx.sampleRate * 2;
+      const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+      const data = buf.getChannelData(0);
+      let last = 0;
+      for (let i = 0; i < bufSize; i++) {
+        const white = Math.random() * 2 - 1;
+        if (audioMode === 1) data[i] = white * 0.04;
+        else if (audioMode === 2) { last = (last + 0.03 * white) / 1.03; data[i] = last * 0.22; }
+        else { last = (last + 0.015 * white) / 1.015; data[i] = last * 0.25 + (Math.random() > 0.9985 ? white * 0.14 : 0); }
+      }
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf; src.loop = true; src.connect(audioCtx.destination); src.start();
+      audioNode = src; showToast(`Playing ${AUDIO_MODES[audioMode]} soundscape`);
+    }
+
+    function exportBackup() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = `bramble-glade-backup-${new Date().toISOString().slice(0,10)}.json`;
+      a.click(); showToast('💾 Backup downloaded!');
+    }
+
+    function importBackup(ev) {
+      const file = ev.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && typeof parsed === 'object') {
+            state = { ...structuredClone(DEFAULT_STATE), ...parsed };
+            if (state.unlocked) state.unlocked = state.unlocked.map(id => id === 'moss_nest' ? 'nest' : id);
+            if (!Array.isArray(state.companions)) state.companions = [];
+            saveState(); showToast('📂 Progress restored!');
+          }
+        } catch (err) { showToast('Could not read backup file'); }
+      };
+      reader.readAsText(file);
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      document.getElementById(`sec-${tab}`).classList.add('active');
+    }
+
+    function renderWheel() {
+      const g = document.getElementById('wheel-nodes'); g.innerHTML = '';
+      SABBATS.forEach(s => {
+        const rad = (s.angle - 90) * Math.PI / 180;
+        const x = 130 + 86 * Math.cos(rad); const y = 130 + 86 * Math.sin(rad);
+        const active = s.id === selectedSabbatId;
+        const node = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        node.style.cursor = 'pointer'; node.onclick = () => { selectedSabbatId = s.id; renderWheel(); };
+        node.innerHTML = `<circle cx="${x}" cy="${y}" r="16" fill="${active ? '#2d543c' : '#16241b'}" stroke="${active ? '#e4b567' : '#4a6b56'}" stroke-width="2" /><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="14">${s.icon}</text>`;
+        g.appendChild(node);
+      });
+      const cur = SABBATS.find(s => s.id === selectedSabbatId) || SABBATS[0];
+      document.getElementById('sabbat-detail').innerHTML = `<div class="row"><strong>${cur.icon} ${cur.name}</strong><span class="pill">${cur.date}</span></div><p style="font-size:0.83rem; margin:6px 0;">${cur.lore}</p><p style="font-size:0.8rem; color:var(--accent); margin:0;"><strong>Woodland Practice:</strong> ${cur.practice}</p>`;
+    }
+
+    function renderAll() {
+      const td = getCurrentTimeDeity(); const dd = getCurrentDayDeity();
+      document.getElementById('deity-time-badge').textContent = `${td.icon} ${td.title} · ${td.deity}`;
+      document.getElementById('deity-day-badge').textContent = `${dd.day} · ${dd.deity}`;
+      document.getElementById('time-deity-card').innerHTML = `<div style="font-size:0.75rem; color:var(--accent);">${td.icon} ${td.title}</div><strong style="font-size:0.88rem; display:block; margin:2px 0;">${td.deity}</strong><div style="font-size:0.77rem; color:var(--text-muted);">${td.note}</div>`;
+      document.getElementById('day-deity-card').innerHTML = `<div style="font-size:0.75rem; color:var(--accent-warm);">${dd.icon} ${dd.day} Resonance</div><strong style="font-size:0.88rem; display:block; margin:2px 0;">${dd.deity}</strong><div style="font-size:0.77rem; color:var(--text-muted);">${dd.lore}</div>`;
+
+      const isWhite = state.coat === 'white' && state.bondLv >= 5;
+      const stage = isWhite ? '🤍 White Stag of Annwn' : state.bondLv >= 5 ? 'Crowned Hart' : state.bondLv >= 3 ? 'Young Stag' : 'Spotted Fawn';
+      document.getElementById('stage-pill').textContent = `${stage} · Lv.${state.bondLv}`;
+
+      document.getElementById('white-stag-aura').style.display = isWhite ? 'block' : 'none';
+      document.getElementById('deer-coat-top').setAttribute('stop-color', isWhite ? '#ffffff' : '#c87b42');
+      document.getElementById('deer-coat-mid').setAttribute('stop-color', isWhite ? '#e6edf2' : '#a65c2b');
+      document.getElementById('deer-coat-belly').setAttribute('stop-color', isWhite ? '#ffffff' : '#f2e4cf');
+      document.getElementById('deer-neck-1').setAttribute('stop-color', isWhite ? '#f7fafc' : '#b86b35');
+      document.getElementById('deer-neck-2').setAttribute('stop-color', isWhite ? '#dce5ec' : '#8c4a1f');
+      document.getElementById('deer-head').setAttribute('fill', isWhite ? '#f7fafc' : '#c87b42');
+      document.getElementById('deer-tail').setAttribute('fill', isWhite ? '#ffffff' : '#b86b35');
+      document.getElementById('deer-chest-ruff').setAttribute('fill', isWhite ? '#ffffff' : '#efe2ce');
+      document.getElementById('deer-ear-r').setAttribute('fill', isWhite ? '#f5f8fa' : '#c87b42');
+      document.getElementById('deer-ear-l').setAttribute('fill', isWhite ? '#dce5ec' : '#9c5527');
+      document.getElementById('deer-leg-fl').setAttribute('fill', isWhite ? '#dce5ec' : '#8f4c22');
+      document.getElementById('deer-leg-bl').setAttribute('fill', isWhite ? '#dce5ec' : '#8f4c22');
+      document.getElementById('deer-leg-fr').setAttribute('fill', isWhite ? '#f5f8fa' : '#b86b35');
+      document.getElementById('deer-leg-br').setAttribute('fill', isWhite ? '#f5f8fa' : '#b86b35');
+      document.getElementById('deer-nose').setAttribute('fill', isWhite ? '#c98a93' : '#241913');
+      document.getElementById('deer-spots').style.display = (state.bondLv >= 5 || isWhite) ? 'none' : 'block';
+      document.getElementById('deer-antlers').setAttribute('stroke', isWhite ? '#f5dfa8' : '#ead9bd');
+
+      const coatCard = document.getElementById('coat-selector-card');
+      coatCard.innerHTML = state.bondLv >= 5
+        ? `<div class="row"><div><strong style="font-size:0.88rem; color:var(--accent-warm);">🤍 Legendary Bond Reward: White Stag Coat</strong><div style="font-size:0.76rem; color:var(--text-muted);">Unlocked at Bond Lv. 5! Switch between Bramble's russet coat and the snow-white Otherworld stag of Annwn.</div></div><div class="row" style="gap:6px;"><button class="btn btn-sm ${!isWhite ? 'btn-primary' : ''}" onclick="toggleDeerCoat('woodland')">🦌 Russet</button><button class="btn btn-sm ${isWhite ? 'btn-warm' : ''}" onclick="toggleDeerCoat('white')">🤍 White Stag</button></div></div>`
+        : `<div class="row"><div><strong style="font-size:0.86rem; color:var(--accent-warm);">🔒 Legendary Bond Lv. 5 Unlock: White Stag Coat</strong><div style="font-size:0.75rem; color:var(--text-muted);">Reach Bond Level 5 (currently Lv.${state.bondLv}) to unlock the luminous white coat of Annwn for Bramble.</div></div><span class="pill">Lv.${state.bondLv} / 5</span></div>`;
+
+      document.getElementById('bond-lv').textContent = state.bondLv;
+      document.getElementById('bond-xp').textContent = state.bondXp;
+      document.getElementById('bond-bar').style.width = `${state.bondXp}%`;
+      document.getElementById('fullness-val').textContent = state.fullness;
+      document.getElementById('fullness-bar').style.width = `${state.fullness}%`;
+      document.getElementById('leaves-top').textContent = state.leaves;
+      document.getElementById('leaves-shop').textContent = state.leaves;
+      document.getElementById('status-line').textContent = state.sleeping ? 'Curled peacefully in the mossy glade...' : 'Waiting peacefully in the mossy glade';
+      document.getElementById('sleep-btn').textContent = state.sleeping ? '☀️ Wake Up' : '🌙 Tuck In';
+      document.getElementById('pet-btn').textContent = `🩷 Pet (${state.petsToday}/3)`;
+      document.getElementById('deer-antlers').style.display = state.bondLv >= 3 ? 'block' : 'none';
+
+      SHOP_ITEMS.forEach(item => { const el = document.getElementById(`decor-${item.id}`); if (el) el.style.display = state.unlocked.includes(item.id) ? 'block' : 'none'; });
+      COMPANION_ITEMS.forEach(item => { const el = document.getElementById(`comp-${item.id}`); if (el) el.style.display = state.companions.includes(item.id) ? 'block' : 'none'; });
+
+      if (state.weather && state.weather.temp !== null) {
+        document.getElementById('weather-pill').textContent = `${state.weather.rain ? '🌧️' : '⛅'} ${state.weather.temp}°C · ${state.weather.pressure} hPa`;
+        document.getElementById('rain-layer').style.display = state.weather.rain ? 'block' : 'none';
+        const alertBox = document.getElementById('pressure-alert-box');
+        if (state.weather.prevPressure && (state.weather.prevPressure - state.weather.pressure) >= 4) {
+          alertBox.style.display = 'block';
+          alertBox.innerHTML = `<strong style="color:var(--accent-warm);">⚠️ Barometric Drop Detected (${(state.weather.pressure - state.weather.prevPressure).toFixed(1)} hPa)</strong><div style="font-size:0.78rem; color:var(--text-muted);">Sharp pressure drops often trigger migraines or joint flares—consider turning on Rest Shield today.</div>`;
+        } else alertBox.style.display = 'none';
+      }
+
+      ['clover', 'dandelion', 'bilberry', 'acorn'].forEach(k => { document.getElementById(`inv-${k}`).textContent = state.inv[k] || 0; });
+
+      const nextQ = state.quests.find(q => !q.done);
+      const nextLabel = nextQ ? (state.restShield && nextQ.lowSpoon ? nextQ.lowSpoon : nextQ.text) : '✨ All quests complete!';
+      document.getElementById('focus-quest-badge').textContent = nextQ ? `🌄 ${nextLabel}` : nextLabel;
+      document.getElementById('rest-btn').textContent = state.restShield ? '🛡️ Rest Shield: ON' : '🛡️ Rest Shield: OFF';
+      document.getElementById('quest-subtitle').textContent = state.restShield ? 'Low-Spoon Flare Mode active: gentle, low-energy versions of your habits are shown.' : 'Complete gentle daily rhythms to earn Forage Leaves and treats for Bramble.';
+      document.getElementById('quest-list').innerHTML = state.quests.map(q => {
+        const label = state.restShield && q.lowSpoon ? q.lowSpoon : q.text;
+        return `<div class="quest-row ${q.done ? 'done' : ''}" onclick="toggleQuest(${q.id})"><span>${q.done ? '✅' : '⬜'} ${label}</span><span class="pill">+${q.reward} 🌿</span></div>`;
+      }).join('');
+
+      document.getElementById('steps-today').textContent = state.stepsToday.toLocaleString();
+      document.getElementById('steps-bar').style.width = `${Math.min(100, (state.stepsToday / 6000) * 100)}%`;
+
+      const withP = state.almanac.filter(e => typeof e.pressure === 'number').slice(0, 7).reverse();
+      document.getElementById('pressure-chart-wrap').innerHTML = withP.length >= 2 ? `<div class="item-card"><div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:6px;">📉 Recent Barometric Pressure Trend (hPa)</div><div style="display:flex; align-items:flex-end; gap:6px; height:48px;">${withP.map(e => { const pct = Math.max(15, Math.min(100, ((e.pressure - 980) / 55) * 100)); const flare = e.tags.some(t => t.includes('Migraine') || t.includes('Flare') || t.includes('Joint')); return `<div style="flex:1; text-align:center;"><div style="height:${pct * 0.4}px; background:${flare ? 'var(--accent-warm)' : 'var(--accent-blue)'}; border-radius:4px;"></div><div style="font-size:0.65rem; color:var(--text-muted); margin-top:2px;">${Math.round(e.pressure)}</div></div>`; }).join('')}</div></div>` : '';
+
+      document.getElementById('almanac-history').innerHTML = state.almanac.slice(0, 6).map(e => `<div class="item-card" style="margin-bottom:6px;"><div class="row" style="font-size:0.76rem; color:var(--text-muted);"><span>${e.date}</span><span>${e.pressure ? e.pressure + ' hPa' : ''}</span></div>${e.tags.length ? `<div style="font-size:0.78rem; color:var(--accent); margin-top:3px;">${e.tags.join(' · ')}</div>` : ''}${e.augury ? `<div style="font-size:0.8rem; color:var(--accent-warm); margin-top:3px;">${e.augury}</div>` : ''}${e.note ? `<div style="font-size:0.82rem; margin-top:3px;">${e.note}</div>` : ''}</div>`).join('');
+
+      document.getElementById('companion-grid').innerHTML = COMPANION_ITEMS.map(item => {
+        const owned = state.companions.includes(item.id);
+        return `<div class="item-card" style="text-align:center;"><div style="font-size:1.55rem;">${item.icon}</div><strong style="font-size:0.84rem; display:block; margin:4px 0 2px;">${item.name}</strong><div style="font-size:0.74rem; color:var(--text-muted); margin-bottom:8px;">${item.desc}</div>${owned ? `<span style="color:var(--accent); font-size:0.79rem; font-weight:600;">✓ In Glade</span>` : `<button class="btn btn-sm btn-primary" onclick="buyCompanion('${item.id}')">${item.cost} 🌿 Invite</button>`}</div>`;
+      }).join('');
+
+      document.getElementById('shop-grid').innerHTML = SHOP_ITEMS.map(item => {
+        const owned = state.unlocked.includes(item.id);
+        return `<div class="item-card" style="text-align:center;"><div style="font-size:1.55rem;">${item.icon}</div><strong style="font-size:0.84rem; display:block; margin:4px 0 2px;">${item.name}</strong><div style="font-size:0.74rem; color:var(--text-muted); margin-bottom:8px;">${item.desc}</div>${owned ? `<span style="color:var(--accent); font-size:0.79rem; font-weight:600;">✓ In Glade</span>` : `<button class="btn btn-sm btn-primary" onclick="buyDecor('${item.id}')">${item.cost} 🌿 Unlock</button>`}</div>`;
+      }).join('');
+
+      document.getElementById('codex-list').innerHTML = CODEX_ENTRIES.map(c => `<div class="item-card" style="margin-bottom:8px;"><strong style="font-size:0.85rem;">${c.title}</strong><p style="font-size:0.79rem; color:var(--text-muted); margin:4px 0 0;">${c.text}</p></div>`).join('');
+      renderWheel();
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
